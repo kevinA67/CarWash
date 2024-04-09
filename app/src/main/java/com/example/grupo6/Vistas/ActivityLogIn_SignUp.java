@@ -23,11 +23,18 @@ import android.widget.ToggleButton;
 import com.example.grupo6.MainActivity;
 import com.example.grupo6.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActivityLogIn_SignUp extends AppCompatActivity {
 
@@ -40,12 +47,14 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
+    FirebaseFirestore db;
 
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
         if (currentUser != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
@@ -168,6 +177,7 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "La contraseña debe de ser de al menos 8 dígitos.", Toast.LENGTH_SHORT).show();
                             } else {
                                 crearUsuario(correo, contra);
+                                //crearUsuarioFirestore();
                             }
                         } else {
                             Toast.makeText(getApplicationContext(), "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show();
@@ -192,14 +202,14 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
             btnIniciarSesion = (Button) findViewById(R.id.btnIniciarSesion);
             txtNombreUsuario = (EditText) findViewById(R.id.txtCorreo);
             txtPassWord = (EditText) findViewById(R.id.txtPassword);
-            txtRecuperar=(TextView) findViewById(R.id.txtViewOlvidoContra);
+            txtRecuperar = (TextView) findViewById(R.id.txtViewOlvidoContra);
 
             btnIniciarSesion.setOnClickListener(View -> {
                 acceder();
             });
 
             txtRecuperar.setOnClickListener(View -> {
-                Intent intent=new Intent(getApplicationContext(), ActivityRecuperarContra.class);
+                Intent intent = new Intent(getApplicationContext(), ActivityRecuperarContra.class);
                 startActivity(intent);
             });
         }
@@ -223,7 +233,7 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
 
                                 if (user != null && user.isEmailVerified()) {
-                                    Intent intent=new Intent(getApplicationContext(),ActivityMenu.class);
+                                    Intent intent = new Intent(getApplicationContext(), ActivityMenu.class);
                                     startActivity(intent);
                                 } else {
                                     // El correo electrónico no está verificado
@@ -275,6 +285,7 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
                                                     // Correo de verificación enviado exitosamente
                                                     Toast.makeText(ActivityLogIn_SignUp.this, "Correo de verificación enviado. Por favor, verifica tu correo electrónico para iniciar sesión.", Toast.LENGTH_LONG).show();
                                                     mAuth.signOut(); // Cerrar sesión para que el usuario verifique su correo electrónico antes de iniciar sesión.
+                                                    //crearUsuarioFirestore();
                                                 } else {
                                                     // Error al enviar el correo de verificación
                                                     Log.e("ActivityLogIn_SignUp", "sendEmailVerification", emailVerificationTask.getException());
@@ -292,6 +303,38 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
                             Log.w("ActivityLogIn_SignUp", "createUserWithEmailAndPassword:failure", task.getException());
                             Toast.makeText(ActivityLogIn_SignUp.this, "Autenticación fallida.", Toast.LENGTH_SHORT).show();
                         }
+                    }
+                });
+    }
+
+    private void crearUsuarioFirestore() {
+        //String userID = mAuth.getCurrentUser().getUid();
+
+        // Crear un objeto Map para almacenar los datos que deseas guardar en Firestore
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("nombres", txtNombre.getText().toString().trim());
+        userData.put("correo", txtCorreo.getText().toString().trim());
+        userData.put("celular", txtCelular.getText().toString().trim());
+
+        // Puedes agregar más campos según sea necesario
+
+        // Agregar los datos del usuario a Firestore
+        db.collection("clientes")
+                .add(userData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        // El documento ha sido creado exitosamente
+                        //Toast.makeText(getApplicationContext(), "Persona creada exitosamente", Toast.LENGTH_SHORT).show();
+                        // Puedes agregar aquí cualquier otra lógica que necesites después de crear la persona
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Ocurrió un error al intentar crear el documento
+                        Toast.makeText(getApplicationContext(), "Error al crear persona: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        // Puedes manejar el error de acuerdo a tus necesidades
                     }
                 });
     }
