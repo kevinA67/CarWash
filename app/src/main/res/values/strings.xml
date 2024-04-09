@@ -33,4 +33,7 @@
     <string name="serviceCita">Servicio de la cita</string>
     <string name="CenterService">Centro de atención</string>
     <string name="Servicios">Servicios</string>
+
+    <string name="recuperar">Ingresa el correo electrónico para recuperar tu cuenta:</string>
+
 </resources>

@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.grupo6.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ActivityMenu extends AppCompatActivity {
 
@@ -24,10 +25,15 @@ public class ActivityMenu extends AppCompatActivity {
     ImageView perfil;
     ImageView cerrarSesion;
 
+    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
+
+        // Inicialización de FirebaseAuth
+        mAuth = FirebaseAuth.getInstance();
 
         //---------CASTING-----------
         citas = (LinearLayout) findViewById(R.id.citas);
@@ -100,8 +106,10 @@ public class ActivityMenu extends AppCompatActivity {
         builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getApplicationContext(), ActivityInicio.class);
                 startActivity(intent);
+                finish();
             }
         });
 
