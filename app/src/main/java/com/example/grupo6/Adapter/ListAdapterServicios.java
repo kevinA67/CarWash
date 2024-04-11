@@ -71,14 +71,14 @@ public class ListAdapterServicios extends RecyclerView.Adapter<ListAdapterServic
         ViewHolder(View itemView) {
             super(itemView);
             nombre = (TextView) itemView.findViewById(R.id.nombreServicios);
-            cantidad=(TextView) itemView.findViewById(R.id.cantidadServicios);
+            //cantidad=(TextView) itemView.findViewById(R.id.cantidadServicios);
             precio=(TextView) itemView.findViewById(R.id.precioServicios);
 
         }
 
         void bindData(final Servicios servicios) {
             nombre.setText(servicios.getNombre());
-            cantidad.setText(servicios.getCantidad());
+            //cantidad.setText(servicios.getCantidad());
             precio.setText(servicios.getPrecio());
         }
     }
