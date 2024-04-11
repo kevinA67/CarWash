@@ -6,11 +6,16 @@ public class Servicios {
     private String nombre;
     private String cantidad;
     private String precio;
-
+    //Constructores
     public Servicios(String numOrden, String nombre, String cantidad, String precio) {
         this.numOrden = numOrden;
         this.nombre = nombre;
         this.cantidad = cantidad;
+        this.precio = precio;
+    }
+
+    public Servicios(String nombre, String precio) {
+        this.nombre = nombre;
         this.precio = precio;
     }
 
