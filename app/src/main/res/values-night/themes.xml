@@ -8,4 +8,13 @@
 
     </style>
 
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <!-- Configura el color de fondo del diálogo -->
+        <item name="android:windowBackground">@color/colorDialogBackground</item>
+        <!-- Configura el color del texto -->
+        <item name="android:textColorPrimary">@color/colorDialogText</item>
+        <!-- Configura el color de los botones -->
+        <item name="android:textColorSecondary">@color/colorDialogButton</item>
+        <!-- Otros atributos que desees configurar -->
+    </style>
 </resources>

@@ -51,7 +51,7 @@
         android:id="@+id/textView4"
         android:layout_width="141dp"
         android:layout_height="27dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="Agregar una cita"
         android:textAlignment="center"
         android:textColor="@color/black"
@@ -78,11 +78,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="5dp"
         android:text="@string/dateCita"
+        android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view" />
 
@@ -91,7 +91,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:clickable="true"
         android:drawableEnd="@drawable/ic_calendar"
@@ -108,7 +107,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:text="@string/timeTilte"
         android:textColor="@color/black"
         android:textSize="16sp"
@@ -121,13 +120,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="5dp"
         android:layout_marginEnd="20dp"
         android:clickable="true"
-        android:textColor="@color/black"
         android:drawableEnd="@drawable/ic_clock"
         android:focusable="false"
         android:inputType="none"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
@@ -137,7 +135,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:text="@string/titleVehiculo"
         android:textColor="@color/black"
         android:textSize="16sp"
@@ -147,20 +145,22 @@
 
     <Spinner
         android:id="@+id/spinnerVehiculos"
+        style="@style/Widget.AppCompat.Spinner.DropDown"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="100dp"
+        android:textAlignment="textStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/floatAddVehiculo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="20dp"
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="@+id/spinnerVehiculos"
         app:layout_constraintEnd_toEndOf="parent"
@@ -173,11 +173,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:text="@string/serviceCita"
-        android:textColor="@color/black"
         android:textAlignment="center"
+        android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -199,11 +199,14 @@
 
     <Switch
         android:id="@+id/switch1"
-        android:layout_width="354dp"
+        android:layout_width="0dp"
         android:layout_height="27dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
         android:text="Servicio a domicilio"
         android:textColor="@color/cardview_dark_background"
+        android:textOn="ON"
         android:textStyle="bold"
         android:thumbTint="#84DAE4"
         android:trackTint="#8BB1B6"
@@ -230,7 +233,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/CenterService"
         android:textColor="@color/black"
         android:textSize="16sp"
@@ -252,14 +255,15 @@
 
     <TextView
         android:id="@+id/textView8"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="@string/Servicios"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/btn_Agregar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinnerCentros" />
 
@@ -267,7 +271,7 @@
         android:id="@+id/btn_Agregar"
         android:layout_width="152dp"
         android:layout_height="40dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="15dp"
         android:backgroundTint="#59DA44"
         android:gravity="center"
         android:onClick="onAddButtonClick"
@@ -285,15 +289,15 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCitas"
-        android:layout_width="374dp"
-        android:layout_height="113dp"
+        android:layout_width="wrap_content"
+        android:layout_height="115dp"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
         android:background="#E8FDFD"
         app:layout_constraintBottom_toTopOf="@+id/view5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_Agregar" />
 
     <View
         android:id="@+id/view5"
@@ -331,7 +335,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
-
+    <EditText
+        android:id="@+id/edxAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="Escriba su dirección"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
