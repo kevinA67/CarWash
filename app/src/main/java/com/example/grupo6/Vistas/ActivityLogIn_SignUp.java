@@ -284,8 +284,9 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
                                                 if (emailVerificationTask.isSuccessful()) {
                                                     // Correo de verificación enviado exitosamente
                                                     Toast.makeText(ActivityLogIn_SignUp.this, "Correo de verificación enviado. Por favor, verifica tu correo electrónico para iniciar sesión.", Toast.LENGTH_LONG).show();
+                                                    String userID = mAuth.getCurrentUser().getUid();
                                                     mAuth.signOut(); // Cerrar sesión para que el usuario verifique su correo electrónico antes de iniciar sesión.
-                                                    //crearUsuarioFirestore();
+                                                    crearUsuarioFirestore(userID);
                                                 } else {
                                                     // Error al enviar el correo de verificación
                                                     Log.e("ActivityLogIn_SignUp", "sendEmailVerification", emailVerificationTask.getException());
@@ -307,8 +308,9 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
                 });
     }
 
-    private void crearUsuarioFirestore() {
+    private void crearUsuarioFirestore(String userId) {
         //String userID = mAuth.getCurrentUser().getUid();
+        DocumentReference documentReference = db.collection("clientes").document(userId);
 
         // Crear un objeto Map para almacenar los datos que deseas guardar en Firestore
         Map<String, Object> userData = new HashMap<>();
@@ -316,26 +318,36 @@ public class ActivityLogIn_SignUp extends AppCompatActivity {
         userData.put("correo", txtCorreo.getText().toString().trim());
         userData.put("celular", txtCelular.getText().toString().trim());
 
-        // Puedes agregar más campos según sea necesario
+        documentReference.set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
 
         // Agregar los datos del usuario a Firestore
-        db.collection("clientes")
-                .add(userData)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        // El documento ha sido creado exitosamente
-                        //Toast.makeText(getApplicationContext(), "Persona creada exitosamente", Toast.LENGTH_SHORT).show();
-                        // Puedes agregar aquí cualquier otra lógica que necesites después de crear la persona
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Ocurrió un error al intentar crear el documento
-                        Toast.makeText(getApplicationContext(), "Error al crear persona: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        // Puedes manejar el error de acuerdo a tus necesidades
-                    }
-                });
+//        db.collection("clientes")
+//                .add(userData)
+//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                    @Override
+//                    public void onSuccess(DocumentReference documentReference) {
+//                        // El documento ha sido creado exitosamente
+//                        //Toast.makeText(getApplicationContext(), "Persona creada exitosamente", Toast.LENGTH_SHORT).show();
+//                        // Puedes agregar aquí cualquier otra lógica que necesites después de crear la persona
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Ocurrió un error al intentar crear el documento
+//                        Toast.makeText(getApplicationContext(), "Error al crear persona: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                        // Puedes manejar el error de acuerdo a tus necesidades
+//                    }
+//                });
     }
 }
