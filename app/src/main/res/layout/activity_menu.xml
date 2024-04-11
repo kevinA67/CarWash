@@ -38,7 +38,7 @@
             android:layout_gravity="end"
             android:layout_marginEnd="15dp"
             android:background="@drawable/circulo"
-            app:srcCompat="@drawable/foto_user" />
+            app:srcCompat="@drawable/ic_usuario" />
 
     </androidx.appcompat.widget.Toolbar>
 
