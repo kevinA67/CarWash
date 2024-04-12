@@ -1,9 +1,11 @@
 package com.example.grupo6.Adapter;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,11 +20,24 @@ public class ListAdapterVehiculo extends RecyclerView.Adapter<ListAdapterVehicul
         private Context mContext;
         private List<Vehiculo> mVehiculos;
         private LayoutInflater inflater;
+        private OnItemClickListener mListener;
+
         //public static int selectedItem = -1;
+
+
+    public interface OnItemClickListener{
+        void onDeleteClick(int position);
+    }
         public ListAdapterVehiculo(Context context, List<Vehiculo> vehiculos) {
             this.inflater = LayoutInflater.from(context);
             this.mContext = context;
             this.mVehiculos = vehiculos;
+        }
+
+
+
+        public void setOnItemClickListener(OnItemClickListener listener){
+            mListener=listener;
         }
 
         @Override
@@ -56,6 +71,7 @@ public class ListAdapterVehiculo extends RecyclerView.Adapter<ListAdapterVehicul
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView marca, modelo, anio, color, combustible, placa;
+        ImageView eliminar;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -65,7 +81,17 @@ public class ListAdapterVehiculo extends RecyclerView.Adapter<ListAdapterVehicul
             color=(TextView) itemView.findViewById(R.id.txt_Colorv);
             combustible=(TextView) itemView.findViewById(R.id.txt_combustiblev);
             placa =(TextView) itemView.findViewById(R.id.txt_placav);
+            eliminar=(ImageView) itemView.findViewById(R.id.eliminarVehiculo);
 
+            eliminar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position=getAdapterPosition();
+                if (position!=RecyclerView.NO_POSITION){
+                    mListener.onDeleteClick(position);
+                }
+                }
+            });
         }
 
         void bindData(final Vehiculo vehiculo) {

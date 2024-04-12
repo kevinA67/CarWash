@@ -13,6 +13,8 @@ public class Vehiculo implements Serializable {
     private String placa;
     private String userId;
 
+    private String id;
+
     public Vehiculo() {
         // Constructor vacío requerido por Firestore
     }
@@ -27,6 +29,24 @@ public class Vehiculo implements Serializable {
         this.userId = userId; // Asignar el ID del usuario
     }
 
+    public Vehiculo(String id,String marca, String modelo, String anio, String color, String combustible, String placa, String userId) {
+        this.marca = marca;
+        this.modelo = modelo;
+        this.anio = anio;
+        this.color = color;
+        this.combustible = combustible;
+        this.placa = placa;
+        this.userId = userId;
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getMarca() {
         return marca;
