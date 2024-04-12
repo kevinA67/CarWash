@@ -69,8 +69,8 @@
         app:srcCompat="@drawable/foto_user"
         android:background="@drawable/circulo"/>
 
-    <TextView
-        android:id="@+id/textView12"
+    <Button
+        android:id="@+id/btn_Foto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cambiar foto"
@@ -196,6 +196,7 @@
         android:drawablePadding="8dp"
         android:layout_marginTop="30dp"
         android:padding="8dp"
+        android:inputType="textPassword"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         android:hint="Contraseña nueva"
@@ -212,6 +213,7 @@
         android:drawablePadding="8dp"
         android:layout_marginTop="20dp"
         android:padding="8dp"
+        android:inputType="textPassword"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         android:hint="Confirmar contraseña"
