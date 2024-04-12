@@ -3,13 +3,23 @@ package com.example.grupo6.Vistas;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -24,6 +34,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +43,9 @@ public class ActivityPerfil extends AppCompatActivity {
     Toolbar toolbarPerfil;
     EditText txtNombre, txtCorreo, txtCelular, txtContra1, txtContra2;
     Switch cambiarPass;
+
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
+    private static final int REQUEST_IMAGE_CAPTURE = 201;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +67,23 @@ public class ActivityPerfil extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // Obtener instancia de Firebase Authentication
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        Button takePhotoButton = findViewById(R.id.btn_Foto);
+        takePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(ActivityPerfil.this, Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // Si los permisos no están concedidos, solicitarlos al usuario
+                    ActivityCompat.requestPermissions(ActivityPerfil.this,
+                            new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                } else {
+                    // Si los permisos están concedidos, abrir la cámara
+                    dispatchTakePictureIntent();
+                }
+            }
+        });
 
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
             DocumentReference docRef = FirebaseFirestore.getInstance().collection("clientes").document(uid);
@@ -145,5 +172,45 @@ public class ActivityPerfil extends AppCompatActivity {
                         });
             }
         });
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                dispatchTakePictureIntent();
+            } else {
+                Toast.makeText(this, "Permisos de cámara denegados", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
+            // Obtener la imagen capturada como un bitmap
+            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+
+            // Convertir el bitmap a una cadena Base64
+            String imageBase64 = bitmapToBase64(imageBitmap);
+
+            // Aquí puedes guardar la imagen en Firebase Storage o hacer lo que necesites con ella
+        }
+    }
+
+    private String bitmapToBase64(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        byte[] imageBytes = outputStream.toByteArray();
+        return Base64.encodeToString(imageBytes, Base64.DEFAULT);
     }
 }

@@ -70,7 +70,7 @@
         android:background="@drawable/circulo"/>
 
     <Button
-        android:id="@+id/textView12"
+        android:id="@+id/btn_Foto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cambiar foto"
