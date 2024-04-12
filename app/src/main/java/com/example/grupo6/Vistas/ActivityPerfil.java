@@ -14,7 +14,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
@@ -35,6 +37,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,9 +49,12 @@ public class ActivityPerfil extends AppCompatActivity {
     Toolbar toolbarPerfil;
     EditText txtNombre, txtCorreo, txtCelular, txtContra1, txtContra2;
     Switch cambiarPass;
+    Button tomarFoto;
+    File foto, foto2;
+    String currentPhotoPath;
 
-    private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private static final int REQUEST_IMAGE_CAPTURE = 201;
+    static final int REQUEST_IMAGE = 101;
+    static final int ACCESS_CAMERA = 201;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +68,7 @@ public class ActivityPerfil extends AppCompatActivity {
         txtContra1 = findViewById(R.id.txt_contra1);
         txtContra2 = findViewById(R.id.txt_contra2);
         cambiarPass = findViewById(R.id.cambiarPass);
+        tomarFoto = findViewById(R.id.btn_Foto);
 
         setSupportActionBar(toolbarPerfil);
 
@@ -67,20 +77,8 @@ public class ActivityPerfil extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        Button takePhotoButton = findViewById(R.id.btn_Foto);
-        takePhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(ActivityPerfil.this, Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // Si los permisos no están concedidos, solicitarlos al usuario
-                    ActivityCompat.requestPermissions(ActivityPerfil.this,
-                            new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-                } else {
-                    // Si los permisos están concedidos, abrir la cámara
-                    dispatchTakePictureIntent();
-                }
-            }
+        tomarFoto.setOnClickListener(View ->{
+            PermisosCamara();
         });
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -174,17 +172,60 @@ public class ActivityPerfil extends AppCompatActivity {
         });
     }
 
+    private void PermisosCamara() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, ACCESS_CAMERA);
+        } else {
+            dispatchTakePictureIntent();
+        }
+    }
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                ex.toString();
+            }
+
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = Uri.fromFile(photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE);
+            }
         }
+    }
+
+    private File createImageFile() throws IOException {
+
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+
+        return image;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+        if (requestCode == ACCESS_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 dispatchTakePictureIntent();
             } else {
@@ -196,9 +237,10 @@ public class ActivityPerfil extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_IMAGE && resultCode == RESULT_OK && data != null) {
             // Obtener la imagen capturada como un bitmap
-            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
 
             // Convertir el bitmap a una cadena Base64
             String imageBase64 = bitmapToBase64(imageBitmap);

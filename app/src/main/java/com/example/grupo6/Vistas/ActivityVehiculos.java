@@ -40,8 +40,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.grupo6.Adapter.ListAdapterVehiculo.OnItemClickListener;
 
-public class ActivityVehiculos extends AppCompatActivity {
+public class ActivityVehiculos extends AppCompatActivity implements ListAdapterVehiculo.OnItemClickListener {
 
     EditText txt_marca, txt_modelo, txt_anio, txt_color, txt_combustible, txt_placa;
     Button btn_Agregar;
@@ -59,6 +60,8 @@ public class ActivityVehiculos extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vehiculos);
+
+
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
@@ -87,15 +90,18 @@ public class ActivityVehiculos extends AppCompatActivity {
         }
 
         // Obtener los datos del usuario desde Firestore y llenar el Spinner
-        obtenerDatosParaSpinner(userId);
 
 
         //------------------GARGAR DATOS-------------------------------------
 
 
-        if (user != null) {
-            userId = user.getUid();
-        }
+//        if (user != null) {
+//            userId = user.getUid();
+//            obtenerDatosParaSpinner(userId);
+//
+//        }
+
+
         //View view = LayoutInflater.from(this).inflate(R.layout.disenio_vehiculo_vista, null);
         //eliminar = view.findViewById(R.id.eliminarVehiculo);
         txt_marca = findViewById(R.id.txt_marca);
@@ -111,6 +117,8 @@ public class ActivityVehiculos extends AppCompatActivity {
 
             }
         });*/
+
+
         btn_Agregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,6 +138,7 @@ public class ActivityVehiculos extends AppCompatActivity {
                             public void onSuccess(DocumentReference documentReference) {
                                 Toast.makeText(ActivityVehiculos.this, "Vehículo agregado correctamente", Toast.LENGTH_SHORT).show();
                                 limpiarCampos();
+                                obtenerDatosParaSpinner(userId);
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
@@ -167,6 +176,7 @@ public class ActivityVehiculos extends AppCompatActivity {
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             try {
                                 Vehiculo vehiculo =new Vehiculo();
+                                vehiculo.setId(documentSnapshot.getId());
                                 vehiculo.setMarca(documentSnapshot.get("marca").toString());
                                 vehiculo.setModelo(documentSnapshot.get("modelo").toString());
                                 vehiculo.setAnio(documentSnapshot.get("anio").toString());
@@ -192,10 +202,39 @@ public class ActivityVehiculos extends AppCompatActivity {
 
     private void llenarLista() {
         listAdapter = new ListAdapterVehiculo(getApplicationContext(), listVehiculos);
+        listAdapter.setOnItemClickListener(this);
         RecyclerView recyclerView = findViewById(R.id.recyclerVehiculos);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(listAdapter);
+    }
+
+    @Override
+    public void onDeleteClick(int position) {
+        // Obtener el ID del vehículo a eliminar
+        String vehiculoId = listVehiculos.get(position).getId(); // Supongamos que hay un método getId() en la clase Vehiculo que devuelve el ID del vehículo
+
+        // Obtener la referencia al documento en Firebase Firestore
+        DocumentReference docRef = db.collection("vehiculos").document(vehiculoId);
+
+        // Eliminar el documento de la colección
+        docRef.delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Eliminación exitosa
+                        listVehiculos.remove(position);
+                        listAdapter.notifyItemRemoved(position);
+                        Toast.makeText(getApplicationContext(), "Vehículo eliminado correctamente", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Error al eliminar
+                        Toast.makeText(getApplicationContext(), "Error al eliminar el vehículo", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     //-------------------ELIMINAR---------------------------------------
